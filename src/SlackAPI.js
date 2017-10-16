@@ -29,6 +29,15 @@ export default class SlackAPI extends EventEmitter {
         this.rtm = new WebSocketClient();
 
         this.get('rtm.connect', {}, (err, resp, body) => {
+            if (err || !body.ok) {
+                this.screen.log("API: rtm.connect failed");
+                this.screen.log(err);
+                this.screen.log(body);
+                console.log("Failed connecting to slack. See log for details.");
+                process.exit(1);
+
+                return;
+            }
 
             this.rtm.on('connect', (connection) => {
 

@@ -51,6 +51,15 @@ var SlackAPI = function (_EventEmitter) {
             this.rtm = new WebSocketClient();
 
             this.get('rtm.connect', {}, function (err, resp, body) {
+                if (err || !body.ok) {
+                    _this2.screen.log("API: rtm.connect failed");
+                    _this2.screen.log(err);
+                    _this2.screen.log(body);
+                    console.log("Failed connecting to slack. See log for details.");
+                    process.exit(1);
+
+                    return;
+                }
 
                 _this2.rtm.on('connect', function (connection) {
 
