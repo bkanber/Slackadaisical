@@ -176,7 +176,7 @@ var SlackAPI = function (_EventEmitter) {
     }, {
         key: 'postMessage',
         value: function postMessage(channel, text, callback) {
-            this.post('chat.postMessage', { channel: channel.id, text: text, as_user: true }, callback);
+            this.post('chat.postMessage', { channel: channel.id, text: text, as_user: true, link_names: true, parse: 'full' }, callback);
         }
     }, {
         key: 'fetchChannels',

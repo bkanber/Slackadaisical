@@ -159,7 +159,7 @@ export default class SlackAPI extends EventEmitter {
     }
 
     postMessage(channel, text, callback) {
-        this.post('chat.postMessage', {channel: channel.id, text, as_user: true}, callback);
+        this.post('chat.postMessage', {channel: channel.id, text, as_user: true, link_names: true, parse: 'full'}, callback);
     }
 
     fetchChannels(callback) {
