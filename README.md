@@ -19,7 +19,7 @@ Installation
 
 Quick version:
 
-    $ echo "YOUR_SLACK_API_USER_TOKEN" | tee ~/.slack_token
+    $ echo "YOUR_SLACK_API_USER_TOKEN" | tee ~/.slack_token # see below
 	$ git clone https://github.com/bkanber/Slackadaisical.git
 	$ cd Slackadaisical
     $ npm install
@@ -32,8 +32,7 @@ Configuration
 The app will yell at you if you don't install a file with your slack token in
 it.
 
-Visit https://api.slack.com/web, scroll down, and generate a token for
-yourself.
+Visit https://api.slack.com/custom-integrations/legacy-tokens and generate a token for yourself.
 
 Then paste that token into `~/.slack_token` and all will be well.
 
