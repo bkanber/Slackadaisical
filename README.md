@@ -34,7 +34,8 @@ it.
 
 Visit https://api.slack.com/custom-integrations/legacy-tokens and generate a token for yourself.
 
-Then paste that token into `~/.slack_token` and all will be well.
+You can install the token with the command `echo "YOUR_TOKEN" | tee ~/.slack_token`, 
+or simply paste that token into `~/.slack_token` and all will be well.
 
 Usage
 -----
