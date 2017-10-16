@@ -16,7 +16,7 @@ export default class MessagesList {
             top: 'top',
             left: '0%',
             width: '100%-2',
-            height: '90%',
+            height: '100%-6',
             tags: true,
             scrollable: true,
             alwaysScroll: true,

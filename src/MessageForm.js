@@ -13,7 +13,7 @@ export default class MessageForm {
             left: 0,
             bottom: 0,
             width: '100%-2',
-            height: '10%',
+            height: 4,
             bg: 'black',
             // border: {type: 'line'}
         });
@@ -23,7 +23,7 @@ export default class MessageForm {
             left: 0,
             top: 0,
             width: '100%',
-            height: '100%',
+            height: 4,
             bg: 'black',
             fg: 'white',
             input: true,
