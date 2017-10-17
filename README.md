@@ -17,7 +17,13 @@ things if the project ends up warranting it, and that's all up to you.
 Installation
 ------------
 
-Quick version:
+Fastest version:
+
+    $ echo "YOUR_SLACK_API_USER_TOKEN" | tee ~/.slack_token # see below
+    $ npm install -g slackadaisical
+    $ slackadaisical
+
+Quick, non-global version:
 
     $ echo "YOUR_SLACK_API_USER_TOKEN" | tee ~/.slack_token # see below
 	$ git clone https://github.com/bkanber/Slackadaisical.git
