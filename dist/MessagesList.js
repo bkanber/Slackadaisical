@@ -110,7 +110,7 @@ var MessagesList = function () {
                 var userName = typeof m.user !== 'undefined' ? _this2.api.getUserName(m.user) : m.username ? m.username : 'Unknown User';
                 var time = moment.unix(m.ts);
                 var formattedTime = time.format('h:mma');
-                var content = '{bold}' + userName + '{/bold} ' + '{grey-fg}' + formattedTime + '{/grey-fg}: ' + (m.text ? m.text : JSON.stringify(m));
+                var content = '{bold}' + userName + '{/bold} ' + '{grey-fg}' + formattedTime + "{/grey-fg}: \n" + (m.text ? m.text : JSON.stringify(m));
                 for (var replaceId in userMap) {
                     var replaceName = userMap[replaceId];
                     content = content.replace(replaceId, replaceName);

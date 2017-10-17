@@ -91,7 +91,7 @@ export default class MessagesList {
                     let time = moment.unix(m.ts);
                     let formattedTime = time.format('h:mma')
                     let content = '{bold}'+userName + '{/bold} '
-                        + '{grey-fg}'+formattedTime+'{/grey-fg}: '
+                        + '{grey-fg}'+formattedTime+"{/grey-fg}: \n"
                         + (m.text ? m.text : JSON.stringify(m));
                     for (const replaceId in userMap) {
                         const replaceName = userMap[replaceId];
