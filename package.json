@@ -20,6 +20,9 @@
     "build": "babel src -d dist --presets es2015,stage-2",
     "serve": "node dist/index.js"
   },
+  "bin": {
+	"slackadaisical": "dist/index.js"
+  },
   "dependencies": {
     "blessed": "^0.1.81",
     "moment": "^2.19.1",

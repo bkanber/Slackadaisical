@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const fs = require('fs');
 const Slacker = require('./Slacker');
 const tokenPath = process.env.HOME + '/.slack_token';
