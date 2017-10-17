@@ -25,6 +25,7 @@ Quick version:
     $ npm install
     $ npm start
 
+Once running, quit the app with Esc or Ctrl-C, and then restart with `npm start` or `yarn start` or `node dist/index.js`.
 
 Configuration
 -------------
