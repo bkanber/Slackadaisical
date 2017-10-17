@@ -53,8 +53,6 @@ Known Issues
 
 Ordering of channels -- because of Slack's API structure, to put the channels in a most-recently-used order we'd need to call conversations.history on every channel. However, Slack's rate limits make that untenable for teams with over 50 channels. For now, channels appear unordered (but bubble to the top upon receiving new messages).
 
-EventEmitter memory leak -- from time to time a warning about EventEmitter having too many event listeners may pop up. Still trying to track this one down.
-
 
 Contributing
 ------------

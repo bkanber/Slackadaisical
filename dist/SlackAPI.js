@@ -72,6 +72,9 @@ var SlackAPI = function (_EventEmitter) {
                         var obj = JSON.parse(data);
                         _this2.messages.push(obj);
                         _this2.emit('message', obj);
+                        // Used only for MessagesList, so that we can removeALlListeners('receive message')
+                        // without interfering with other listeners that need messages
+                        _this2.emit('receive message', obj);
 
                         if (_this2.channels[obj.channel]) {
                             if (typeof _this2.channels[obj.channel].history === 'undefined') {

@@ -50,6 +50,9 @@ export default class SlackAPI extends EventEmitter {
                     const obj = JSON.parse(data);
                     this.messages.push(obj);
                     this.emit('message', obj);
+                    // Used only for MessagesList, so that we can removeALlListeners('receive message')
+                    // without interfering with other listeners that need messages
+                    this.emit('receive message', obj);
 
                     if (this.channels[obj.channel]) {
                         if (typeof this.channels[obj.channel].history === 'undefined') {

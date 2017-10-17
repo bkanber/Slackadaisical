@@ -52,6 +52,7 @@ var MessagesList = function () {
         this.init();
 
         this.loadHistory = this.loadHistory.bind(this);
+        this.receiveMessage = this.receiveMessage.bind(this);
     }
 
     _createClass(MessagesList, [{
@@ -66,10 +67,9 @@ var MessagesList = function () {
     }, {
         key: 'init',
         value: function init() {
-            this.box.enableInput();
-            this.screen.render();
             this.refresh();
-            this.api.on('message', this.receiveMessage.bind(this));
+            this.api.on('receive message', this.receiveMessage.bind(this));
+            this.screen.log('MessagesList: Init');
         }
     }, {
         key: 'receiveMessage',
@@ -92,6 +92,8 @@ var MessagesList = function () {
     }, {
         key: 'destroy',
         value: function destroy() {
+            this.screen.log("Removing event listener");
+            this.api.removeAllListeners('receive message');
             this.exists = false;
             this.box.destroy();
         }

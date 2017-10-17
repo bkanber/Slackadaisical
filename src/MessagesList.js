@@ -53,10 +53,8 @@ export default class MessagesList {
     }
 
     init() {
-        this.box.enableInput();
-        this.screen.render();
         this.refresh();
-        this.api.on('message', this.receiveMessage.bind(this));
+        this.api.on('receive message', this.receiveMessage.bind(this));
     }
 
     receiveMessage(obj) {
@@ -72,6 +70,7 @@ export default class MessagesList {
     }
 
     destroy() {
+        this.api.removeAllListeners('receive message');
         this.exists = false;
         this.box.destroy();
     }
