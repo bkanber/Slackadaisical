@@ -4,6 +4,11 @@
 var fs = require('fs');
 var Slacker = require('./Slacker');
 var tokenPath = process.env.HOME + '/.slack_token';
+var values = require('object.values');
+
+if (!Object.values) {
+    values.shim();
+}
 
 var token = null;
 
