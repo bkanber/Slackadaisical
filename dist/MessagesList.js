@@ -109,7 +109,10 @@ var MessagesList = function () {
                 var time = moment.unix(m.ts);
                 var formattedTime = time.format('h:mma');
                 var text = (m.text ? m.text : JSON.stringify(m));
-                var content = '{bold}{green-fg}' + userName + '{/bold}{/green-fg} ' + '{cyan-fg}' + formattedTime + "{/cyan-fg}: \n" + text;
+                var content = '{bold}{green-fg}' + userName 
+                + '{/bold}{/green-fg} ' 
+                + '{cyan-fg}' + formattedTime + "{/cyan-fg}: \n" 
+                + text;
                 for (var replaceId in userMap) {
                     var replaceName = userMap[replaceId];
                     content = content.replace(replaceId, replaceName);
