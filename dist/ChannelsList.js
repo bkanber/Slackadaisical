@@ -65,9 +65,8 @@ var ChannelsList = function (_EventEmitter) {
             },
             style: {
                 fg: 'white',
-                bg: 'black',
                 border: {
-                    fg: '#f0f0f0'
+                    fg: 'yellow',
                 },
                 hover: {
                     bg: 'green'
