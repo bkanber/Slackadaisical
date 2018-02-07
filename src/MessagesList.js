@@ -3,6 +3,8 @@ const blessed = require('blessed');
 const wrap = require('word-wrap');
 const moment = require('moment');
 
+const TIME_FORMAT = 'HH:mm';
+
 class MessagesList {
 
     constructor(channel) {
@@ -80,6 +82,19 @@ class MessagesList {
         this.box.destroy();
     }
 
+    renderIm(m, userName) {
+        let time = moment.unix(m.ts);
+        let formattedTime = time.format(TIME_FORMAT);
+        
+        return `{bold}${userName}{/bold} {grey-fg}${formattedTime}{/grey-fg}: \n${m.text}`;
+    }
+    
+    renderAttachments(attachments, userName) {
+        return attachments.map(attachment => {
+            return `{bold}${attachment.title}{bold}\n${attachment.title_link}`
+        }).join('\n');
+    }
+
     render() {
         // prevent against
         if (!this.box) return null;
@@ -87,25 +102,28 @@ class MessagesList {
         const userMap = this.getUserReplacementMap();
         let lines = [];
         this.messages
-                .filter(m => m.type === 'message')
-                .forEach((m, l) => {
-                    const userName = (typeof m.user !== 'undefined')
-                        ? this.api.getUserName(m.user)
-                        : (m.username ? m.username : 'Unknown User')
-                    ;
+            .filter(m => m.type === 'message')
+            .forEach((m, l) => {
+                const userName = (typeof m.user !== 'undefined')
+                    ? this.api.getUserName(m.user)
+                    : (m.username ? m.username : 'Unknown User')
+                ;
 
-                    let time = moment.unix(m.ts);
-                    let formattedTime = time.format('HH:mm');
-                    let content = '{bold}'+ userName.trim() + '{/bold} '
-                        + '{grey-fg}'+formattedTime+"{/grey-fg}: \n"
-                        + wrap((m.text ? m.text : JSON.stringify(m)), {width});
-                    for (const replaceId in userMap) {
-                        const replaceName = userMap[replaceId];
-                        content = content.replace(replaceId, replaceName);
-                    }
-                    const wrapped = content + "\n";
-                    lines.push(wrapped);
-                });
+                let content;
+                if (m.text) {
+                    content = this.renderIm(m, userName)
+                } else if (m.message && m.message.attachments) {
+                    content = this.renderAttachments(m.message.attachments, userName);
+                } else {
+                    content = '';
+                }
+                for (const replaceId in userMap) {
+                    const replaceName = userMap[replaceId];
+                    content = content.replace(replaceId, replaceName);
+                }
+                const wrapped = content + "\n";
+                lines.push(wrapped);
+            });
 
         this.box.setContent(lines.join("\n") + "\n");
         this.box.setScrollPerc(100);

@@ -7,7 +7,7 @@
   "author": "Burak Kanber <burak@burakkanber.com>",
   "license": "GPL-3.0",
   "devDependencies": {
-    "nodemon": "^1.12.1",
+    "nodemon": "^1.12.1"
   },
   "scripts": {
     "start": "node src/index.js",
