@@ -4,9 +4,39 @@ const request = require('request');
 const WebSocketClient = require('websocket').client;
 
 
-export const SLACK_API = 'https://slack.com/api/';
+const SLACK_API = 'https://slack.com/api/';
 
-export default class SlackAPI extends EventEmitter {
+class DeferredCallbacks {
+    constructor() {
+        this.pending = 0;
+        this.finalCallback;
+    }
+
+    add(callback) {
+        this.pending++;
+        const self = this;
+        return (...args) => {
+            if (typeof callback !== 'undefined') {
+                callback.apply(this, args);
+            }
+
+            this.pending--;
+            if (this.pending === 0 && typeof this.finalCallback === 'function') {
+                this.finalCallback();
+            }
+        }
+    }
+
+    afterAll(callback) {
+        this.finalCallback = callback;
+
+        if (this.pending === 0) {
+            this.finalCallback();
+        }
+    }
+}
+
+class SlackAPI extends EventEmitter {
     constructor(token, screen) {
         super();
 
@@ -21,11 +51,12 @@ export default class SlackAPI extends EventEmitter {
     }
 
     init() {
+        this.fetchIdentity();
         this.fetchUsers();
-        this.connectRTM();
     }
 
-    connectRTM() {
+    connectRTM(callback) {
+        this.screen.log('API: Connecting RTM');
         this.rtm = new WebSocketClient();
 
         this.get('rtm.connect', {}, (err, resp, body) => {
@@ -48,9 +79,19 @@ export default class SlackAPI extends EventEmitter {
                 connection.on('message', (message) => {
                     const data = message.utf8Data;
                     const obj = JSON.parse(data);
+                    
+                    if (typeof obj.channel === 'undefined' || !obj.channel) {
+                        this.screen.log('API: Received message not attached to a channel');
+                        this.screen.log(obj);
+                        return;
+                    }
+                    
+                    this.screen.log('Received message');
+                    this.screen.log(obj);
+                    
                     this.messages.push(obj);
                     this.emit('message', obj);
-                    // Used only for MessagesList, so that we can removeALlListeners('receive message')
+                    // Used only for MessagesList, so that we can removeAllListeners('receive message')
                     // without interfering with other listeners that need messages
                     this.emit('receive message', obj);
 
@@ -75,10 +116,12 @@ export default class SlackAPI extends EventEmitter {
             this.rtm.on('connectFailed', function(error) {
                 console.log('Connect Error: ' + error.toString());
             });
-
-
+            
+            if (typeof callback === 'function') {
+                this.rtm.on('connect', callback);
+            }
+            
             this.rtm.connect(body.url);
-
         });
 
     }
@@ -89,10 +132,11 @@ export default class SlackAPI extends EventEmitter {
         if (channel.is_im) {
             display_name = '@' + this.getUserName(channel.user);
         } else if (channel.is_mpim) {
-            display_name = '@' + display_name
+            const members = display_name
                 .replace('mpdm-', '')
                 .replace('-1', '')
-                .replace(/--/g, ', ');
+                .split('--');
+            display_name = '@' + members.map(member => member.substr(0, 5)).join(',')
         } else if (channel.is_channel || channel.is_private) {
             display_name = '#' + display_name;
         }
@@ -117,17 +161,20 @@ export default class SlackAPI extends EventEmitter {
             });
 
             let mostRecentMessage = mostRecentMessages[0];
-            const payload = {channel: channel.id, ts: mostRecentMessage.ts};
+            // Mark channel as read (if there are messages)
+            if (mostRecentMessage) {
+                const payload = {channel: channel.id, ts: mostRecentMessage.ts};
 
-            this.screen.log("API: Marking channel as read");
-            this.screen.log(mostRecentMessage);
-            this.screen.log(JSON.stringify(payload));
+                this.screen.log("API: Marking channel as read");
+                this.screen.log(JSON.stringify(payload));
 
-            this.post(endpoint, payload, (err, resp, body) => {
-                this.screen.log("API: Marking channel as read got response");
-                this.screen.log(JSON.stringify(body));
-                if (typeof callback === 'function') callback(body);
-            });
+                this.post(endpoint, payload, (err, resp, body) => {
+                    this.screen.log("API: Marking channel as read got response");
+                    this.screen.log(JSON.stringify(body));
+                    if (typeof callback === 'function') callback(body);
+                });    
+            }
+            
         } else {
             this.screen.log("API: Couldn't mark channel " + channel.id + " as read");
             this.screen.log(JSON.stringify(this.channels[channel.id]));
@@ -152,6 +199,23 @@ export default class SlackAPI extends EventEmitter {
             }
         );
     }
+    
+    fetchChannelInfo(channel, callback) {
+        return this.get(
+            'conversations.info',
+            {channel: channel.id},
+            (err, resp, body) => {
+                if (err) {
+                    this.screen.log(`API: Error fetching channel info for ${channel.id}`)
+                    this.screen.log(err);
+                    return;
+                }
+                if (typeof callback === 'function') {
+                    callback(body.channel);
+                }
+            }
+        )
+    }
 
     getUser(id) {
         return this.users[id] || {id, name: id};
@@ -166,20 +230,41 @@ export default class SlackAPI extends EventEmitter {
     }
 
     fetchChannels(callback) {
+        const self = this;
         return this.get(
             'conversations.list',
             {exclude_archived: true, types: 'public_channel,private_channel,mpim,im', limit: 500},
             (err, resp, body) => {
 
                 let out = {};
+                const deferredInfo = new DeferredCallbacks();
+                self.channels = {};
                 for (const channel of body.channels) {
-                    out[channel.id] = channel;
+                    this.fetchChannelInfo(channel, deferredInfo.add((info) => {
+                        self.channels[channel.id] = info;
+                    }));
                 }
-                this.channels = out;
-
-                if (typeof callback === 'function') callback(out);
+                
+                deferredInfo.afterAll(() => {
+                    self.screen.log('Finished fetching channels');
+                    if (typeof callback === 'function') {
+                        callback(self.channels);
+                    }
+                });
             }
         );
+    }
+
+    fetchIdentity(callback) {
+        return this.get('auth.test', {}, (err, resp, body) => {
+            if (err) {
+                this.screen.log('API: Error retrieving user identity');
+                this.screen.log(err);
+            }
+            this.identity = body;
+            
+            if (typeof callback === 'function') callback(this.identity);
+        });
     }
 
     fetchUsers(callback) {

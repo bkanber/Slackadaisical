@@ -5,7 +5,7 @@ const ChannelsList = require('./ChannelsList');
 const ChannelBox = require('./Channel');
 const moment = require('moment');
 
-export default class Slacker {
+class Slacker {
 
     constructor(token) {
         this.token = token;
@@ -37,12 +37,12 @@ export default class Slacker {
         }
 
         this.channelBox = new ChannelBox(this.channel, this.screen, this.api);
-
+        this.channelBox.messageForm.textbox.focus();
     }
 
     init() {
 
-        this.screen.key(['escape', 'C-c'], function(ch, key) {
+        this.screen.key(['escape', 'C-c', 'C-q'], function(ch, key) {
             return process.exit(0);
         });
 
@@ -69,6 +69,8 @@ export default class Slacker {
         });
 
         this.channelsList.init();
+        // Focus channels list right away as there's nothing else interactive on screen
+        this.channelsList.box.focus();
     }
 
 }

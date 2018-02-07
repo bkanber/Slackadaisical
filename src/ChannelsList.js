@@ -1,6 +1,7 @@
-
 const EventEmitter = require('events').EventEmitter;
 const blessed = require('blessed');
+const notifier = require('node-notifier');
+
 
 const SHOULD_FETCH_HISTORIES = false;
 // how long before an individual channel history, once fetched,
@@ -18,7 +19,7 @@ const shuffle = (a) => {
     }
 };
 
-export default class ChannelsList extends EventEmitter {
+class ChannelsList extends EventEmitter {
 
     constructor(screen, api) {
         super();
@@ -102,20 +103,24 @@ export default class ChannelsList extends EventEmitter {
 
         this.screen.append(this.box);
 
-        this.init()
-
         this.refreshTimer = setInterval(() => { this.refresh(); }, REFRESH_INTERVAL);
     }
 
     initMessageListener() {
-
         this.api.on('message', (message) => {
-
             // increment unread display count
             if (message.type === 'message' && message.channel) {
                 for (const index in this.channels) {
                     if (this.channels[index].id === message.channel) {
                         this.screen.log("ChannelList: Received new message");
+                        if (message.user !== this.api.identity.user_id) {
+                            const channel = this.channels[index];
+                            const locationWord = channel.is_im ? 'from' : 'in'
+                            notifier.notify({
+                                title: `New slack message ${locationWord} ${channel.display_name}`,
+                                message: message.text
+                            });
+                        }                
                         if (message.channel !== this.selectedChannelId) {
                             this.channels[index].has_unread = true;
                             this.screen.log("ChannelList: marking unselected channel as unread " + this.channels[index].id);
@@ -135,13 +140,11 @@ export default class ChannelsList extends EventEmitter {
 
                 }
             }
-
         });
-
+        this.api.connectRTM();
     }
 
     setChannels(channels) {
-
         this.channels = channels.map(ch => {
             ch = Object.assign({}, ch);
             // ch.history = {unread_count_display: 3};
@@ -164,36 +167,49 @@ export default class ChannelsList extends EventEmitter {
         this.renderChannels();
     }
 
+    sorter(channelA, channelB) {
+        if (channelA.is_im === channelB.is_im) {
+            const aName = channelA.display_name.substring(1);
+            const bName = channelB.display_name.substring(1);
+            return aName.localeCompare(bName);
+        } else if (channelA.is_im && !channelB.is_im) {
+            return -1;
+        } else {
+            return 1;
+        }
+        // (a, b) => {
+//            let ats = -1;
+//            let bts = -1;
+//
+//            if (a.history && a.history.messages && a.history.messages[0]) {
+//                if (typeof a.history.messages[0].ts === 'undefined') {
+//                    ats = 0;
+//                } else {
+//                    ats = parseFloat(a.history.messages[0].ts);
+//                }
+//            }
+//
+//            if (b.history && b.history.messages && b.history.messages[0]) {
+//                if (typeof b.history.messages[0].ts === 'undefined') {
+//                    bts = 0;
+//                } else {
+//                    bts = parseFloat(b.history.messages[0].ts);
+//                }
+//            }
+//
+//            if (ats == bts) return 0;
+//            return ats < bts ? 1 : -1;
+//        }
+    }
+
     renderChannels() {
         // this.box.clearItems();
 
         const lastSelected = this.box.selected;
 
         this.channels
-            .filter(ch => ch.is_member || ch.is_im)
-            .sort((a, b) => {
-                let ats = -1;
-                let bts = -1;
-
-                if (a.history && a.history.messages && a.history.messages[0]) {
-                    if (typeof a.history.messages[0].ts === 'undefined') {
-                        ats = 0;
-                    } else {
-                        ats = parseFloat(a.history.messages[0].ts);
-                    }
-                }
-
-                if (b.history && b.history.messages && b.history.messages[0]) {
-                    if (typeof b.history.messages[0].ts === 'undefined') {
-                        bts = 0;
-                    } else {
-                        bts = parseFloat(b.history.messages[0].ts);
-                    }
-                }
-
-                if (ats == bts) return 0;
-                return ats < bts ? 1 : -1;
-            })
+            .filter(ch => (ch.is_channel && ch.is_member) || ch.is_im || ch.is_open)
+            .sort(this.sorter)
             .forEach((ch, i) => {
                 // check if has item first
                 if (typeof this.box.items[i] !== 'undefined') {

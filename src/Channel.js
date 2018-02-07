@@ -3,7 +3,7 @@ var blessed = require('blessed');
 const MessagesList = require('./MessagesList');
 const MessageForm = require('./MessageForm');
 
-export default class ChannelBox {
+class ChannelBox {
 
     constructor(channel, screen, api) {
         this.channel = channel;

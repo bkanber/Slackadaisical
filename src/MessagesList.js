@@ -3,7 +3,7 @@ const blessed = require('blessed');
 const wrap = require('word-wrap');
 const moment = require('moment');
 
-export default class MessagesList {
+class MessagesList {
 
     constructor(channel) {
         this.channel = channel;
@@ -37,7 +37,12 @@ export default class MessagesList {
             }
         });
 
-        this.messages = [];
+        this.messages = [
+            'Loading messages, please wait.'
+        ];
+
+        // Initial (blank) render
+        this.render();
 
         this.init();
 
@@ -78,28 +83,28 @@ export default class MessagesList {
     render() {
         // prevent against
         if (!this.box) return null;
-        let lines = [];
         const width = parseInt(this.box.width) - 15;
         const userMap = this.getUserReplacementMap();
+        let lines = [];
         this.messages
                 .filter(m => m.type === 'message')
-                .forEach(m => {
+                .forEach((m, l) => {
                     const userName = (typeof m.user !== 'undefined')
                         ? this.api.getUserName(m.user)
                         : (m.username ? m.username : 'Unknown User')
                     ;
+
                     let time = moment.unix(m.ts);
-                    let formattedTime = time.format('h:mma')
-                    let content = '{bold}'+userName + '{/bold} '
+                    let formattedTime = time.format('HH:mm');
+                    let content = '{bold}'+ userName.trim() + '{/bold} '
                         + '{grey-fg}'+formattedTime+"{/grey-fg}: \n"
-                        + (m.text ? m.text : JSON.stringify(m));
+                        + wrap((m.text ? m.text : JSON.stringify(m)), {width});
                     for (const replaceId in userMap) {
                         const replaceName = userMap[replaceId];
                         content = content.replace(replaceId, replaceName);
                     }
-                    const wrapped = wrap(content, {width}) + "\n";
-                    const exploded = wrapped.split("\n");
-                    lines = lines.concat(exploded);
+                    const wrapped = content + "\n";
+                    lines.push(wrapped);
                 });
 
         this.box.setContent(lines.join("\n") + "\n");
