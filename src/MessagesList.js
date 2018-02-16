@@ -68,6 +68,9 @@ class MessagesList {
         if (!this.exists) return null;
         if (obj.channel === this.channel.channel.id) {
             this.messages.push(obj);
+            if (obj.type === 'message' && this.api.identity.user_id !== obj.user) {
+                this.api.markChannelRead(this.channel.channel);                
+            }
             this.render();
         }
     }
