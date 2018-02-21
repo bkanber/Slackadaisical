@@ -1,12 +1,11 @@
-
 const blessed = require('blessed');
-const SlackAPI = require('./SlackAPI');
-const ChannelsList = require('./ChannelsList');
-const ChannelBox = require('./Channel');
 const moment = require('moment');
 
-class Slacker {
+const SlackAPI = require('./SlackAPI');
+const ui = require('./ui');
 
+
+class Slacker {
     constructor(token) {
         this.token = token;
 
@@ -21,7 +20,7 @@ class Slacker {
         });
 
         this.api = new SlackAPI(this.token, this.screen);
-        this.channelsList = new ChannelsList(this.screen, this.api);
+        this.channelsList = new ui.ChannelsList(this.screen, this.api);
         this.channel = null;
         this.channelBox = null;
 
@@ -36,7 +35,7 @@ class Slacker {
             this.channelBox = null;
         }
 
-        this.channelBox = new ChannelBox(this.channel, this.screen, this.api);
+        this.channelBox = new ui.ChannelBox(this.channel, this.screen, this.api);
         this.channelBox.messageForm.textbox.focus();
     }
 

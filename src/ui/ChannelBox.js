@@ -4,7 +4,6 @@ const MessagesList = require('./MessagesList');
 const MessageForm = require('./MessageForm');
 
 class ChannelBox {
-
     constructor(channel, screen, api) {
         this.channel = channel;
         this.screen = screen;
