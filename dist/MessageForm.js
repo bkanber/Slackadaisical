@@ -26,7 +26,7 @@ var MessageForm = function () {
             left: 0,
             bottom: 0,
             width: '100%-2',
-            height: 4,
+            height: 4
             // border: {type: 'line'}
         });
 
@@ -41,7 +41,7 @@ var MessageForm = function () {
             keys: true,
             inputOnFocus: true,
             label: 'Write Message (Ctrl-o)',
-            border: { type: 'line', fg: 'yellow' },
+            border: { type: 'line', fg: 'yellow' }
         });
 
         this.textbox.key('enter', function (ch, key) {

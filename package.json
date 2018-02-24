@@ -1,6 +1,6 @@
 {
   "name": "slackadaisical",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "A command-line Slack chat client.",
   "main": "dist/index.js",
   "repository": "https://github.com/bkanber/Slackadaisical.git",

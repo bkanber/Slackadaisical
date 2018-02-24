@@ -35,7 +35,7 @@ var ChannelBox = function () {
             style: {
                 fg: 'white',
                 border: {
-                    fg: 'yellow',
+                    fg: 'yellow'
                 }
             }
         });
