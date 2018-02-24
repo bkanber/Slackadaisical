@@ -1,6 +1,6 @@
 {
   "name": "slackadaisical",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "A command-line Slack chat client.",
   "main": "dist/index.js",
   "repository": "https://github.com/bkanber/Slackadaisical.git",
@@ -28,6 +28,7 @@
     "moment": "^2.19.1",
     "node-fetch": "^1.7.3",
     "object.values": "^1.0.4",
+    "node-notifier": "^5.2.1",
     "request": "^2.83.0",
     "websocket": "^1.0.24",
     "word-wrap": "^1.2.3"

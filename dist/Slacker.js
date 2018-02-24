@@ -1,18 +1,14 @@
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var blessed = require('blessed');
-var SlackAPI = require('./SlackAPI');
-var ChannelsList = require('./ChannelsList');
-var ChannelBox = require('./Channel');
 var moment = require('moment');
+
+var SlackAPI = require('./SlackAPI');
+var ui = require('./ui');
 
 var Slacker = function () {
     function Slacker(token) {
@@ -31,7 +27,7 @@ var Slacker = function () {
         });
 
         this.api = new SlackAPI(this.token, this.screen);
-        this.channelsList = new ChannelsList(this.screen, this.api);
+        this.channelsList = new ui.ChannelsList(this.screen, this.api);
         this.channel = null;
         this.channelBox = null;
 
@@ -48,14 +44,15 @@ var Slacker = function () {
                 this.channelBox = null;
             }
 
-            this.channelBox = new ChannelBox(this.channel, this.screen, this.api);
+            this.channelBox = new ui.ChannelBox(this.channel, this.screen, this.api);
+            this.channelBox.messageForm.textbox.focus();
         }
     }, {
         key: 'init',
         value: function init() {
             var _this = this;
 
-            this.screen.key(['escape', 'C-c'], function (ch, key) {
+            this.screen.key(['escape', 'C-c', 'C-q'], function (ch, key) {
                 return process.exit(0);
             });
 
@@ -82,13 +79,12 @@ var Slacker = function () {
             });
 
             this.channelsList.init();
+            // Focus channels list right away as there's nothing else interactive on screen
+            this.channelsList.box.focus();
         }
     }]);
 
     return Slacker;
 }();
-
-exports.default = Slacker;
-
 
 module.exports = Slacker;

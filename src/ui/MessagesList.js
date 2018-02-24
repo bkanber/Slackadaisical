@@ -3,7 +3,9 @@ const blessed = require('blessed');
 const wrap = require('word-wrap');
 const moment = require('moment');
 
-export default class MessagesList {
+const TIME_FORMAT = 'HH:mm';
+
+class MessagesList {
 
     constructor(channel) {
         this.channel = channel;
@@ -35,7 +37,12 @@ export default class MessagesList {
             }
         });
 
-        this.messages = [];
+        this.messages = [
+            'Loading messages, please wait.'
+        ];
+
+        // Initial (blank) render
+        this.render();
 
         this.init();
 
@@ -59,6 +66,9 @@ export default class MessagesList {
         if (!this.exists) return null;
         if (obj.channel === this.channel.channel.id) {
             this.messages.push(obj);
+            if (obj.type === 'message' && this.api.identity.user_id !== obj.user) {
+                this.api.markChannelRead(this.channel.channel);                
+            }
             this.render();
         }
     }
@@ -73,33 +83,48 @@ export default class MessagesList {
         this.box.destroy();
     }
 
+    renderIm(m, userName) {
+        let time = moment.unix(m.ts);
+        let formattedTime = time.format(TIME_FORMAT);
+        
+        return `{bold}{green-fg}${userName}{/green-fg}{/bold} {cyan-fg}${formattedTime}{/cyan-fg}: \n${m.text}`;
+    }
+    
+    renderAttachments(attachments, userName) {
+        return attachments.map(attachment => {
+            return `{bold}${attachment.title}{/bold}\n${attachment.title_link}`
+        }).join('\n');
+    }
+
     render() {
         // prevent against
         if (!this.box) return null;
-        let lines = [];
         const width = parseInt(this.box.width) - 15;
         const userMap = this.getUserReplacementMap();
+        let lines = [];
         this.messages
-                .filter(m => m.type === 'message')
-                .forEach(m => {
-                    const userName = (typeof m.user !== 'undefined')
-                        ? this.api.getUserName(m.user)
-                        : (m.username ? m.username : 'Unknown User')
-                    ;
-                    let time = moment.unix(m.ts);
-                    let formattedTime = time.format('h:mma')
-                    let text = (m.text ? m.text : JSON.stringify(m));
-                    let content = '{bold}{green-fg}'+userName + '{/bold}{green-fg} '
-                        + '{cyan-fg}'+formattedTime+"{/cyan-fg}: \n"
-                        + text;
-                    for (const replaceId in userMap) {
-                        const replaceName = userMap[replaceId];
-                        content = content.replace(replaceId, replaceName);
-                    }
-                    const wrapped = wrap(content, {width}) + "\n";
-                    const exploded = wrapped.split("\n");
-                    lines = lines.concat(exploded);
-                });
+            .filter(m => m.type === 'message')
+            .forEach((m, l) => {
+                const userName = (typeof m.user !== 'undefined')
+                    ? this.api.getUserName(m.user)
+                    : (m.username ? m.username : 'Unknown User')
+                ;
+
+                let content;
+                if (m.text) {
+                    content = this.renderIm(m, userName)
+                } else if (m.message && m.message.attachments) {
+                    content = this.renderAttachments(m.message.attachments, userName);
+                } else {
+                    content = '';
+                }
+                for (const replaceId in userMap) {
+                    const replaceName = userMap[replaceId];
+                    content = content.replace(replaceId, replaceName);
+                }
+                const wrapped = content + "\n";
+                lines.push(wrapped);
+            });
 
         this.box.setContent(lines.join("\n") + "\n");
         this.box.setScrollPerc(100);

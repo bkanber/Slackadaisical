@@ -1,6 +1,6 @@
 var blessed = require('blessed');
 
-export default class MessageForm {
+class MessageForm {
 
     constructor(channel) {
         this.channel = channel;
