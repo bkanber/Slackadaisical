@@ -122,7 +122,9 @@ var SlackAPI = function (_EventEmitter) {
             var endpoint = 'channels.mark';
             if (channel.is_im) endpoint = 'im.mark';else if (channel.is_private) endpoint = 'groups.mark';else if (channel.is_mpim) endpoint = 'mpim.mark';
 
-            if (this.channels[channel.id] && this.channels[channel.id].history && this.channels[channel.id].history.messages) {
+            if (this.channels[channel.id] && this.channels[channel.id].history && this.channels[channel.id].history.messages && this.channels[channel.id].history.messages.some(function (m) {
+                return typeof m.ts !== 'undefined';
+            })) {
                 var mostRecentMessages = this.channels[channel.id].history.messages.filter(function (m) {
                     return typeof m.ts !== 'undefined';
                 }).sort(function (a, b) {

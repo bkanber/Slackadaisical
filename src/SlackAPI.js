@@ -107,7 +107,7 @@ export default class SlackAPI extends EventEmitter {
         else if (channel.is_private) endpoint = 'groups.mark';
         else if (channel.is_mpim) endpoint = 'mpim.mark';
 
-        if (this.channels[channel.id] && this.channels[channel.id].history && this.channels[channel.id].history.messages) {
+        if (this.channels[channel.id] && this.channels[channel.id].history && this.channels[channel.id].history.messages && this.channels[channel.id].history.messages.some(m => typeof m.ts !== 'undefined')) {
             let mostRecentMessages = this.channels[channel.id].history.messages.filter(m => typeof m.ts !== 'undefined').sort((a, b) => {
                 let ats = 0;
                 let bts = 0;
