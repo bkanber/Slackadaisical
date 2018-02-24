@@ -14,7 +14,6 @@ export default class MessageForm {
             bottom: 0,
             width: '100%-2',
             height: 4,
-            bg: 'black',
             // border: {type: 'line'}
         });
 
@@ -24,14 +23,12 @@ export default class MessageForm {
             top: 0,
             width: '100%',
             height: 4,
-            bg: 'black',
-            fg: 'white',
             input: true,
             mouse: true,
             keys: true,
             inputOnFocus: true,
             label: 'Write Message (Ctrl-o)',
-            border: {type: 'line'}
+            border: {type: 'line', fg: 'yellow' }
         });
 
         this.textbox.key('enter', (ch, key) => {

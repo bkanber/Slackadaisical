@@ -29,10 +29,8 @@ export default class MessagesList {
                 inverse: true
             },
             style: {
-                fg: 'white',
-                bg: 'black',
                 border: {
-                    fg: '#f0f0f0'
+                    fg: 'yellow',
                 }
             }
         });
@@ -90,9 +88,10 @@ export default class MessagesList {
                     ;
                     let time = moment.unix(m.ts);
                     let formattedTime = time.format('h:mma')
-                    let content = '{bold}'+userName + '{/bold} '
-                        + '{grey-fg}'+formattedTime+"{/grey-fg}: \n"
-                        + (m.text ? m.text : JSON.stringify(m));
+                    let text = (m.text ? m.text : JSON.stringify(m));
+                    let content = '{bold}{green-fg}'+userName + '{/bold}{green-fg} '
+                        + '{cyan-fg}'+formattedTime+"{/cyan-fg}: \n"
+                        + text;
                     for (const replaceId in userMap) {
                         const replaceName = userMap[replaceId];
                         content = content.replace(replaceId, replaceName);
