@@ -29,6 +29,7 @@ Quick, non-global version:
 	$ git clone https://github.com/bkanber/Slackadaisical.git
 	$ cd Slackadaisical
     $ npm install
+    $ npm run build
     $ npm start
 
 Once running, quit the app with Esc or Ctrl-C, and then restart with `npm start` or `yarn start` or `node dist/index.js`.
@@ -54,6 +55,12 @@ Hit Escape or Ctrl-c to exit.
 **Mouse**: If your terminal supports mouse events, you may try clicking or scrolling in things. 
 
 TODO: More stuff here.
+
+Command line arguments
+----------------------
+
+- channels-width the set width of the channels list on the left side. Default is 25 columns.
+
 
 Known Issues
 ------------

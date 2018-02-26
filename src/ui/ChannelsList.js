@@ -21,7 +21,7 @@ const shuffle = (a) => {
 
 class ChannelsList extends EventEmitter {
 
-    constructor(screen, api) {
+    constructor(screen, api, options) {
         super();
 
         this.selectedChannelId = null;
@@ -29,12 +29,11 @@ class ChannelsList extends EventEmitter {
         this.api = api;
         this.channels = [];
 
-
         this.box = blessed.list({
             parent: this.screen,
             top: 'top',
             left: 'left',
-            width: '30%',
+            width: options.channelsWidth,
             height: '100%',
             label: "Channels (Ctrl-l)",
             tags: true,

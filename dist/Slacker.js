@@ -11,10 +11,11 @@ var SlackAPI = require('./SlackAPI');
 var ui = require('./ui');
 
 var Slacker = function () {
-    function Slacker(token) {
+    function Slacker(token, options) {
         _classCallCheck(this, Slacker);
 
         this.token = token;
+        this.options = options;
 
         this.screen = blessed.screen({
             smartCSR: true,
@@ -27,7 +28,7 @@ var Slacker = function () {
         });
 
         this.api = new SlackAPI(this.token, this.screen);
-        this.channelsList = new ui.ChannelsList(this.screen, this.api);
+        this.channelsList = new ui.ChannelsList(this.screen, this.api, this.options);
         this.channel = null;
         this.channelBox = null;
 
@@ -44,7 +45,7 @@ var Slacker = function () {
                 this.channelBox = null;
             }
 
-            this.channelBox = new ui.ChannelBox(this.channel, this.screen, this.api);
+            this.channelBox = new ui.ChannelBox(this.channel, this.screen, this.api, this.option);
             this.channelBox.messageForm.textbox.focus();
         }
     }, {

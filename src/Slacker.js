@@ -6,8 +6,9 @@ const ui = require('./ui');
 
 
 class Slacker {
-    constructor(token) {
+    constructor(token, options) {
         this.token = token;
+        this.options = options;
 
         this.screen = blessed.screen({
             smartCSR: true,
@@ -20,9 +21,10 @@ class Slacker {
         });
 
         this.api = new SlackAPI(this.token, this.screen);
-        this.channelsList = new ui.ChannelsList(this.screen, this.api);
+        this.channelsList = new ui.ChannelsList(this.screen, this.api, this.options);
         this.channel = null;
         this.channelBox = null;
+        
 
         this.screen.log(moment().format() + ": Slacker Init");
     }
@@ -35,7 +37,7 @@ class Slacker {
             this.channelBox = null;
         }
 
-        this.channelBox = new ui.ChannelBox(this.channel, this.screen, this.api);
+        this.channelBox = new ui.ChannelBox(this.channel, this.screen, this.api, this.option);
         this.channelBox.messageForm.textbox.focus();
     }
 
