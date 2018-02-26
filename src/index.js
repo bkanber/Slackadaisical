@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const fs = require('fs');
+const commandLineArgs = require('command-line-args');
 const Slacker = require('./Slacker');
 const tokenPath = process.env.HOME + '/.slack_token';
 const values = require('object.values');
@@ -8,6 +9,11 @@ const values = require('object.values');
 if (!Object.values) {
     values.shim();
 }
+
+const optionsDef = [
+    { name: 'channels-width', type: Number, defaultValue: 25 }
+];
+const options = commandLineArgs(optionsDef, { camelCase: true });
 
 let token = null;
 
@@ -18,7 +24,7 @@ try {
     process.exit(1);
 }
 
-const app = new Slacker(token);
+const app = new Slacker(token, options);
 app.init();
 
 

@@ -35,7 +35,7 @@ var shuffle = function shuffle(a) {
 var ChannelsList = function (_EventEmitter) {
     _inherits(ChannelsList, _EventEmitter);
 
-    function ChannelsList(screen, api) {
+    function ChannelsList(screen, api, options) {
         _classCallCheck(this, ChannelsList);
 
         var _this = _possibleConstructorReturn(this, (ChannelsList.__proto__ || Object.getPrototypeOf(ChannelsList)).call(this));
@@ -49,7 +49,7 @@ var ChannelsList = function (_EventEmitter) {
             parent: _this.screen,
             top: 'top',
             left: 'left',
-            width: '30%',
+            width: options.channelsWidth,
             height: '100%',
             label: "Channels (Ctrl-l)",
             tags: true,
