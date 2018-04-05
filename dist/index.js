@@ -3,44 +3,37 @@
 
 var fs = require('fs');
 var Slacker = require('./Slacker');
+var configPath = process.env.HOME + '/.slackadaisical.json';
 var tokenPath = process.env.HOME + '/.slack_token';
 
 var token = null;
 
 try {
-    var tokenFileContents = fs.readFileSync(tokenPath).toString().trim();
+    // Try to read the config file as JSON. Failing this will fall back to
+    // the old slack_token file.
+    var config = JSON.parse(fs.readFileSync(configPath).toString());
 
-    try {
-        // Try to parse as JSON, where keys are workspace names
-        var data = JSON.parse(tokenFileContents);
+    // Get the workspace name (the last arg from the CLI call)
+    var wsName = process.argv.slice(-1)[0];
+    if (wsName.endsWith("slackadaisical") || wsName.endsWith("index.js")) {
+        // The user forgot to specify a workspace!
+        console.error("If using multi-workspace mode, you must specify a workspace " + "with `slackadaisical [workspacename]`.");
+        process.exit(1);
+    }
 
-        // If that succeeds, then we need a workspace name
-        // which will be the last commandline arg. If we look
-        // for it and we get back the name of this executable,
-        // then the user forgot the workspace name.
-        var wsName = process.argv.slice(-1)[0];
-        if (wsName.endsWith("slackadaisical") || wsName.endsWith("index.js")) {
-            console.error("If using multi-workspace mode, you must specify a workspace " + "with `slackadaisical [workspacename]`.");
-            process.exit(1);
-        }
-
-        // If we CAN find that workspace name in the JSON,
-        // then set it as the token for this session.
-        if (!!data[wsName]) {
-            token = data[wsName];
-        } else {
-            // Otherwise, warn the user and exit.
-            console.log('Couldn\'t find workspace [' + wsName + '] in ~/.slack_token.');
-            process.exit(1);
-        }
-    } catch (e) {
-        // Fall back to a file that contains only one token (for
-        // backwards compatibility)
-        token = tokenFileContents;
+    if (!!config.workspaces[wsName]) {
+        token = config.workspaces[wsName].token;
+    } else {
+        // Otherwise, warn the user and exit.
+        console.log('Couldn\'t find workspace [' + wsName + '] in ~/.slackadaisical.json. ' + 'Your options are: \n' + Object.keys(config.workspaces).map(function (i) {
+            return '* ' + i;
+        }).join("\n"));
+        process.exit(1);
     }
 } catch (e) {
-    console.log("Could not find a slack token at " + tokenPath);
-    process.exit(1);
+    // Perhaps the user is using the old slack_token file?
+    console.log('Couldn\'t parse ~/.slackadaisical.json, falling back to ~/.slack_token.');
+    token = fs.readFileSync(tokenPath).toString().trim();
 }
 
 var app = new Slacker(token);
