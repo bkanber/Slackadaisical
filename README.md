@@ -36,13 +36,34 @@ Once running, quit the app with Esc or Ctrl-C, and then restart with `npm start`
 Configuration
 -------------
 
-The app will yell at you if you don't install a file with your slack token in
-it.
+The app will yell at you if you don't install a file with your slack token in it.
 
 Visit https://api.slack.com/custom-integrations/legacy-tokens and generate a token for yourself.
 
-You can install the token with the command `echo "YOUR_TOKEN" | tee ~/.slack_token`, 
+You can install the token with the command `echo "YOUR_TOKEN" | tee ~/.slack_token`,
 or simply paste that token into `~/.slack_token` and all will be well.
+
+### Multi-Workspace Mode
+Slackadaisical supports multiple slack workspaces. Simply use a `~/.slackadaisical.json` file instead of a `~/.slack_token` file. In `~/.slackadaisical.json`, put the following (substituting your tokens for the `####`s).
+
+```json
+{
+    "workspaces": {
+        "workspace_one": {
+            "token": "####"
+        },
+        "workspace_two": {
+            "token": "####"
+        }
+    }
+}
+
+```
+
+and then run:
+
+    $ slackadaisical workspace_one
+
 
 Usage
 -----
@@ -51,7 +72,7 @@ Hit Escape or Ctrl-c to exit.
 
 **Navigating**: Hit Ctrl-l to jump to the channels list (j/k or arrows to move, Enter to select), Ctrl-o to compose (Enter to send), and Ctrl-y to jump to the channel messages history. Hit Esc to exit compose mode.
 
-**Mouse**: If your terminal supports mouse events, you may try clicking or scrolling in things. 
+**Mouse**: If your terminal supports mouse events, you may try clicking or scrolling in things.
 
 TODO: More stuff here.
 
