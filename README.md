@@ -44,18 +44,25 @@ You can install the token with the command `echo "YOUR_TOKEN" | tee ~/.slack_tok
 or simply paste that token into `~/.slack_token` and all will be well.
 
 ### Multi-Workspace Mode
-Slackadaisical supports multiple slack workspaces. Simply change your `~/.slack_token` file to a JSON file as per below:
+Slackadaisical supports multiple slack workspaces. Simply use a `~/.slackadaisical.json` file instead of a `~/.slack_token` file. In `~/.slackadaisical.json`, put the following (substituting your tokens for the `####`s).
 
 ```json
 {
-    "myWorkspace":        "xxx-slack-token-...",
-    "myOtherWorkspace":   "xxx-slack-token-...",
+    "workspaces": {
+        "workspace_one": {
+            "token": "####"
+        },
+        "workspace_two": {
+            "token": "####"
+        }
+    }
 }
+
 ```
 
 and then run:
 
-    $ slackadaisical myWorkspace
+    $ slackadaisical workspace_one
 
 
 Usage
